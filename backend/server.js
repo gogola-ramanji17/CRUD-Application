@@ -5,7 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use(express.urlencoded({extended:true}));
 const db = mysql.createPool({
     host:'localhost',
     user:'root',
@@ -29,17 +29,20 @@ app.get('/',(req,res)=>{
 })
 
 app.post('/student',(req,res)=>{
-    const Name = req.body.Name;
-    const Email = req.body.Email;
-    const sql = 'INSERT INTO students ("Name","Email") VALUES (?,?);'
-    console.log(req.body);
+   
+   const Name = req.body.name;
+   const Email = req.body.email;
+   const sql = 'INSERT INTO students(Name,Email)VALUES (?,?)';
+    
+    console.log(Name);
     db.query(sql,[Name,Email],(err,result)=>{
         if(err){
             return res.json(err);
+            console.log(err);
         }
         else{
             return res.json(result);
-            console.log(result);
+            
         }
     })
 })
@@ -53,7 +56,7 @@ app.get('/read/:id',(req,res)=>{
         }
         else{
              res.json(result);
-            console.log(result);
+          
             
         }
     })
@@ -62,15 +65,30 @@ app.get('/read/:id',(req,res)=>{
 
 app.put('/update/:id',(req,res)=>{
     const id = req.params.id;
-    const Name = req.body.Nmae;
-    const Email = req.body.Email;
-
+    const Name = req.body.name;
+    const Email = req.body.email;
+    console.log(Name);
     db.query('UPDATE students SET Name = ?,Email = ? WHERE id = ?',[Name,Email,id],(err,result)=>{
         if(err){
             return res.json({Message:"inside server error"})
         }
         else{
             return res.json(result);
+            
+        }
+    })
+})
+
+app.delete('/delete/:id',(req,res)=>{
+    const id = req.params.id;
+    
+    db.query('DELETE FROM students WHERE id = ?',[id],(err,result)=>{
+        if(err){
+            return res.json({message:"server error"});
+        }
+        else{
+            return res.json(result);
+            console.log(result);
         }
     })
 })
